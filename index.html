@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Chemistry Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Soil Chemistry Quiz</h1>
+        <form id="quiz-form">
+            <div class="question">
+                <h3>1. What is the pH range of acidic soil?</h3>
+                <div class="answers">
+                    <label><input type="radio" name="q1" value="a"> 6.5 - 7.5</label>
+                    <label><input type="radio" name="q1" value="b"> 5.0 - 6.5</label>
+                    <label><input type="radio" name="q1" value="c"> Below 5.0</label>
+                    <label><input type="radio" name="q1" value="d"> Above 7.5</label>
+                </div>
+            </div>
+            <div class="question">
+                <h3>2. Which element is most commonly associated with soil salinity?</h3>
+                <div class="answers">
+                    <label><input type="radio" name="q2" value="a"> Potassium (K)</label>
+                    <label><input type="radio" name="q2" value="b"> Calcium (Ca)</label>
+                    <label><input type="radio" name="q2" value="c"> Sodium (Na)</label>
+                    <label><input type="radio" name="q2" value="d"> Iron (Fe)</label>
+                </div>
+            </div>
+            <button type="button" class="submit-btn" onclick="submitQuiz()">Submit</button>
+        </form>
+        <div class="result" id="result"></div>
+        <div id="explanations"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
