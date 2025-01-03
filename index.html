@@ -3,36 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soil Chemistry Quiz</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Scientific Name Quiz Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #start-page, #game-page, #end-page {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 70%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+
+        #start-page h1 {
+            font-size: 40px;
+            color: #1f78b4;
+            margin-bottom: 20px;
+        }
+
+        #instructions {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        #game-page {
+            font-size: 22px;
+            color: #333;
+        }
+
+        #question-container {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #answer {
+            font-size: 20px;
+            padding: 12px;
+            width: 70%;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-style: italic;
+        }
+
+        .timer {
+            font-size: 20px;
+            color: #ff6347;
+            margin-top: 10px;
+        }
+
+        #remaining {
+            font-size: 20px;
+            color: #444;
+        }
+
+        .button {
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #1f78b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #155a7a;
+        }
+
+        #restart-btn, #exit-btn {
+            background-color: #4caf50;
+        }
+
+        .game-over, .congratulations {
+            font-size: 28px;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .game-over {
+            color: #e74c3c;
+        }
+
+        .congratulations {
+            color: #2ecc71;
+        }
+
+        .remaining {
+            font-size: 22px;
+            color: #444;
+        }
+    </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <h1>Soil Chemistry Quiz</h1>
-        <form id="quiz-form">
-            <div class="question">
-                <h3>1. What is the pH range of acidic soil?</h3>
-                <div class="answers">
-                    <label><input type="radio" name="q1" value="a"> 6.5 - 7.5</label>
-                    <label><input type="radio" name="q1" value="b"> 5.0 - 6.5</label>
-                    <label><input type="radio" name="q1" value="c"> Below 5.0</label>
-                    <label><input type="radio" name="q1" value="d"> Above 7.5</label>
-                </div>
-            </div>
-            <div class="question">
-                <h3>2. Which element is most commonly associated with soil salinity?</h3>
-                <div class="answers">
-                    <label><input type="radio" name="q2" value="a"> Potassium (K)</label>
-                    <label><input type="radio" name="q2" value="b"> Calcium (Ca)</label>
-                    <label><input type="radio" name="q2" value="c"> Sodium (Na)</label>
-                    <label><input type="radio" name="q2" value="d"> Iron (Fe)</label>
-                </div>
-            </div>
-            <button type="button" class="submit-btn" onclick="submitQuiz()">Submit</button>
-        </form>
-        <div class="result" id="result"></div>
-        <div id="explanations"></div>
+
+<div id="start-page">
+    <h1>Scientific Name Quiz Game</h1>
+    <div id="instructions">
+        <p><strong>Instructions:</strong></p>
+        <ul>
+            <li>Type the correct scientific name for each crop shown.</li>
+            <li>Answer is case-sensitive! Make sure to match the capitalization exactly.</li>
+            <li>If you answer incorrectly or run out of time, the game ends.</li>
+            <li>Answer all questions correctly to win!</li>
+        </ul>
     </div>
-    <script src="script.js"></script>
+    <button class="button" id="start-btn">Start Game</button>
+</div>
+
+<div id="game-page" class="hidden">
+    <h2>Crop Scientific Name Quiz</h2>
+    <div id="question-container"></div>
+    <div id="remaining" class="remaining"></div>
+    <input type="text" id="answer" placeholder="Type the scientific name" autocomplete="off">
+    <div id="timer" class="timer"></div>
+    <button class="button" id="submit-btn">Submit</button>
+</div>
+
+<div id="end-page" class="hidden">
+    <div id="game-over" class="game-over hidden">
+        Game Over! The correct answer was: <span id="correct-answer"></span>
+    </div>
+    <div id="congratulations" class="congratulations hidden">
+        Congratulations! You won!
+    </div>
+    <button class="button" id="restart-btn">Restart</button>
+    <button class="button" id="exit-btn">Exit</button>
+</div>
+
+<script>
+    const questions = [
+        { crop: 'Papaya', scientific: 'Carica papaya' },
+        { crop: 'Lime', scientific: 'Citrus aurantiifolia' },
+        { crop: 'Pomelo', scientific: 'Citrus maxima' },
+        { crop: 'Sweet Orange', scientific: 'Citrus sinensis' },
+        { crop: 'Sour Orange', scientific: 'Citrus aurantium' },
+        { crop: 'Pepper', scientific: 'Piper nigrum' },
+        { crop: 'Clove', scientific: 'Syzygium aromaticum' },
+        { crop: 'Nutmeg', scientific: 'Myristica fragrans' },
+        { crop: 'Cocoa', scientific: 'Theobroma cacao' },
+        { crop: 'Cardamom', scientific: 'Elettaria cardamomum' },
+        { crop: 'Ginger', scientific: 'Zingiber officinale' },
+        { crop: 'Turmeric', scientific: 'Curcuma longa' },
+        { crop: 'Coconut', scientific: 'Cocos nucifera' },
+        { crop: 'Cinnamon', scientific: 'Cinnamomum verum' },
+        { crop: 'Tea', scientific: 'Camellia sinensis' },
+        { crop: 'Rubber', scientific: 'Hevea brasiliensis' },
+        { crop: 'Coffee', scientific: 'Coffea arabica' }
+    ];
+
+    let shuffledQuestions = [];
+    let currentQuestionIndex = 0;
+    let remainingQuestions = questions.length;
+    let timer;
+    let timeLeft = 15;
+    let correctAnswer = '';
+
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('submit-btn').addEventListener('click', checkAnswer);
+    document.getElementById('restart-btn').addEventListener('click', restartGame);
+    document.getElementById('exit-btn').addEventListener('click', exitGame);
+
+    function startGame() {
+        shuffledQuestions = shuffleArray([...questions]);
+        currentQuestionIndex = 0;
+        remainingQuestions = shuffledQuestions.length;
+        document.getElementById('start-page').classList.add('hidden');
+        document.getElementById('game-page').classList.remove('hidden');
+        loadQuestion();
+        startTimer();
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex < shuffledQuestions.length) {
+            const question = shuffledQuestions[currentQuestionIndex];
+            correctAnswer = question.scientific;  // Store the correct answer
+            document.getElementById('question-container').textContent = `What is the scientific name of ${question.crop}?`;
+            document.getElementById('remaining').textContent = `${remainingQuestions} questions remaining.`;
+            document.getElementById('answer').value = '';
+            document.getElementById('submit-btn').classList.remove('hidden');
+        } else {
+            clearInterval(timer);
+            document.getElementById('game-page').classList.add('hidden');
+            document.getElementById('end-page').classList.remove('hidden');
+            document.getElementById('congratulations').classList.remove('hidden');
+            document.getElementById('restart-btn').classList.remove('hidden');
+        }
+    }
+
+    function startTimer() {
+        timeLeft = 15;
+        document.getElementById('timer').textContent = `Time remaining: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').textContent = `Time remaining: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                gameOver();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer() {
+        const userAnswer = document.getElementById('answer').value.trim();
+        if (userAnswer === correctAnswer) {
+            nextQuestion();
+        } else {
+            gameOver();
+        }
+    }
+
+    function nextQuestion() {
+        remainingQuestions--;
+        currentQuestionIndex++;
+        loadQuestion();
+        startTimer();
+    }
+
+    function gameOver() {
+        clearInterval(timer);
+        document.getElementById('game-page').classList.add('hidden');
+        document.getElementById('end-page').classList.remove('hidden');
+        document.getElementById('game-over').classList.remove('hidden');
+        document.getElementById('correct-answer').innerHTML = `<i>${correctAnswer}</i>`;
+        document.getElementById('restart-btn').classList.remove('hidden');
+    }
+
+    function restartGame() {
+        document.getElementById('end-page').classList.add('hidden');
+        document.getElementById('start-page').classList.remove('hidden');
+    }
+
+    function exitGame() {
+        window.close();
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+</script>
+
 </body>
 </html>
+
